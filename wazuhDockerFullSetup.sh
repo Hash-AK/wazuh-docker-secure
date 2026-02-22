@@ -5,7 +5,7 @@ set -e
 
 # Configuration
 REPO_URL="https://github.com/wazuh/wazuh-docker.git"
-BRANCH="v4.11.2"
+BRANCH="v4.14.3"
 CLONE_DIR="wazuh-docker"
 TARGET_DIR="${CLONE_DIR}/single-node"
 DEFAULT_PASSWORD="SecretPassword"  # Default password in Wazuh
@@ -191,7 +191,7 @@ for USER in "${USERS_TO_UPDATE[@]}"; do
     
     # Generate hash for the password
     echo "Generating password hash for $USER..."
-    PASSWORD_HASH=$(docker run --rm wazuh/wazuh-indexer:4.11.2 bash /usr/share/wazuh-indexer/plugins/opensearch-security/tools/hash.sh -p "$NEW_PASSWORD" | grep '^\$2' | head -1)
+    PASSWORD_HASH=$(docker run --rm wazuh/wazuh-indexer:4.14.3 bash /usr/share/wazuh-indexer/plugins/opensearch-security/tools/hash.sh -p "$NEW_PASSWORD" | grep '^\$2' | head -1)
     echo "Generated password hash for $USER: $PASSWORD_HASH"
     
     # Update the hash in internal_users.yml
@@ -302,14 +302,14 @@ echo "Running security admin script inside the container..."
 docker exec -i "$INDEXER_CONTAINER" bash << 'EOF'
 # Set variables
 export INSTALLATION_DIR=/usr/share/wazuh-indexer
-CACERT=$INSTALLATION_DIR/certs/root-ca.pem
-KEY=$INSTALLATION_DIR/certs/admin-key.pem
-CERT=$INSTALLATION_DIR/certs/admin.pem
+CACERT=$INSTALLATION_DIR/config/certs/root-ca.pem
+KEY=$INSTALLATION_DIR/config/certs/admin-key.pem
+CERT=$INSTALLATION_DIR/config/certs/admin.pem
 export JAVA_HOME=/usr/share/wazuh-indexer/jdk
 
 # Run the security admin script
 echo "Running securityadmin.sh script for all security config updates..."
-bash /usr/share/wazuh-indexer/plugins/opensearch-security/tools/securityadmin.sh -cd /usr/share/wazuh-indexer/opensearch-security/ -nhnv -cacert $CACERT -cert $CERT -key $KEY -p 9200 -icl
+bash /usr/share/wazuh-indexer/plugins/opensearch-security/tools/securityadmin.sh -cd /usr/share/wazuh-indexer/config/opensearch-security/ -nhnv -cacert $CACERT -cert $CERT -key $KEY -p 9200 -icl
 EOF
 
 # Final message

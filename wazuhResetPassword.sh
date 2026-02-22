@@ -166,7 +166,7 @@ echo ""
 
 # Generate hash for the new password
 echo "Generating password hash..."
-PASSWORD_HASH=$(docker run --rm wazuh/wazuh-indexer:4.11.2 bash /usr/share/wazuh-indexer/plugins/opensearch-security/tools/hash.sh -p "$NEW_PASSWORD" | grep '^\$2' | head -1)
+PASSWORD_HASH=$(docker run --rm wazuh/wazuh-indexer:4.14.3 bash /usr/share/wazuh-indexer/plugins/opensearch-security/tools/hash.sh -p "$NEW_PASSWORD" | grep '^\$2' | head -1)
 echo "Generated password hash: $PASSWORD_HASH"
 
 # Update the internal_users.yml file with the new hash
@@ -255,14 +255,14 @@ echo "Running security admin script inside the container..."
 docker exec -i "$INDEXER_CONTAINER" bash << 'EOF'
 # Set variables
 export INSTALLATION_DIR=/usr/share/wazuh-indexer
-CACERT=$INSTALLATION_DIR/certs/root-ca.pem
-KEY=$INSTALLATION_DIR/certs/admin-key.pem
-CERT=$INSTALLATION_DIR/certs/admin.pem
+CACERT=$INSTALLATION_DIR/config/certs/root-ca.pem
+KEY=$INSTALLATION_DIR/config/certs/admin-key.pem
+CERT=$INSTALLATION_DIR/config/certs/admin.pem
 export JAVA_HOME=/usr/share/wazuh-indexer/jdk
 
 # Run the security admin script
 echo "Running securityadmin.sh script..."
-bash /usr/share/wazuh-indexer/plugins/opensearch-security/tools/securityadmin.sh -cd /usr/share/wazuh-indexer/opensearch-security/ -nhnv -cacert $CACERT -cert $CERT -key $KEY -p 9200 -icl
+bash /usr/share/wazuh-indexer/plugins/opensearch-security/tools/securityadmin.sh -cd /usr/share/wazuh-indexer/config/opensearch-security/ -nhnv -cacert $CACERT -cert $CERT -key $KEY -p 9200 -icl
 EOF
 
 # Final message
